@@ -1,0 +1,214 @@
+assets_root: assets
+
+scene:
+    n_envs: 4
+    es: 1
+    gui: 1
+    gym:
+      dt: 0.01
+      substeps: 2
+      flex:
+        solver_type: 5
+        num_outer_iterations: 4
+        num_inner_iterations: 30
+        relaxation: 0.75
+        warm_start: 0.8
+        shape_collision_margin: 1e-3
+        contact_regularization: 1e-7
+        deterministic_mode: True
+    cams:
+        cam0:
+            use: False
+            cam_pos: [0.8, 1.4, 0.0]
+            look_at: [0.6, 0.5, 0.0]
+            props:
+                width: 480
+                height: 320
+        cam1:
+            use: False
+            cam_pos: [0.8, 1.0, -0.4]
+            look_at: [0.5, 0.5, -0.2]
+            props:
+                width: 480
+                height: 320
+        cam2:
+            use: True
+            cam_pos: [0.8, 1.0, 0.4]
+            look_at: [0.5, 0.5, 0.2]
+            props:
+                width: 480
+                height: 320
+        hand_cam0: 
+            use: False
+            attach_to_hand: True
+            props:
+                width: 480
+                height: 320
+    light:
+        color: [0.25, 0.25, 0.25]
+        ambient: [0.75, 0.75, 0.75]
+        direction: [2.0, 1, 0.0]
+
+franka: 
+    urdf_template: franka_description/robots/franka_panda_dynamics_hex_screw_{}.urdf
+    assets_root: assets
+    custom_ee_rb_name: hex_screw_wrench
+    custom_ee_offset: [0, 0, 0.07385]
+    asset_options:
+        fix_base_link: True
+        flip_visual_attachments: True
+        armature: 0.01
+        max_linear_velocity: 100.0
+        max_angular_velocity: 40.0
+        disable_gravity: True
+    attractor_props:
+        stiffness: 1e3
+        damping: 2.5e2
+    shape_props:
+        thickness: 1e-3
+    dof_props:
+        stiffness: [2e3, 2e3, 2e3, 2e3, 2e3, 2e3, 2e3, 1e2, 1e2]
+        damping: [2e2, 2e2, 2e2, 2e2, 2e2, 2e2, 2e2, 5, 5]
+        effort: [87, 87, 87, 87, 12, 12, 12, 100, 100]
+    action:
+        mode: vic
+        vic: 
+            max_tra_delta: 0.01 # m
+            max_rot_delta: 5 # deg
+            min_stiffness: 1e2
+            max_stiffness: 1e4
+        hfpc_cartesian_gains:
+            max_tra_delta: 0.01 # m
+            max_rot_delta: 5 # deg
+            max_force_delta: 5 # N
+            min_pos_kp: 1
+            max_pos_kp: 100
+            min_force_kp: 0.01
+            max_force_kp: 10
+
+action:
+    attractor_stiffness: 1e3
+    type: raw # raw, combo, priority
+    raw: 
+        # limits: [0.1, 0.1, 0.1, 40, 40, 40]
+        # limits: [0.01, 0.01, 0.01, 10, 10, 10] 
+        limits: [0.025, 0.025, 0.025, 10, 10, 10] 
+    dx: 0.03
+    df: 1e-4
+    dtheta: 10
+    dl: 0.01
+    kI_f: 1e-4
+    auto_clip_actions: True
+    n_interp_steps: 10
+    only_y_axis_rot: False
+    screw_normal_offset: [0, 0.02, 0]
+    attractors:
+        screw_normal: True
+        screw_pos: True
+        screw_rot: True
+        screw_force: True
+        screw_no_normal_movement: True
+
+task: 
+    max_steps: 250 
+    task_angle_th: 5 # degrees
+    task_angle_target: -70 # degree
+    ctrlr_angle_target: 100 # degree
+    rot_force_th: 16 # Newtons
+    max_attractor_force_th: 20  # Newtons
+    screw_depth_th: 2e-3 # M
+    add_hex_screw_offset_to_obs: False
+    expand_MDP: False
+    expand_MDP_obs_type: multi_one_hot # index, single_one_hot, multi_one_hot, features
+    sample_init_screw_angle: False
+    use_controller_features: False
+
+env:
+    n_inter_steps: 10
+
+rews:
+    alive_penalty: -1.0
+    task_bonus: 1000
+    angle_weight: 10
+    approach_weight: 400
+    vert_angle_penalty: -1.0
+    force_penalty: -0.0
+    expand_MDP_same_controller_reward: -0.1  # -0.1, -1, -10 ?
+    
+table:
+    dims:
+        width: 1
+        height: 0.5
+        depth: 1
+    shape_props:
+        friction: 0.1
+        rolling_friction: 0
+        torsion_friction: 0
+        thickness: 2e-3
+    asset_options:
+        fix_base_link: True
+
+hex_screw_base:
+    urdf_template: hex_screw/hex_screw_base_{}.urdf
+    shape_props:
+        friction: 0.2
+        rolling_friction: 0.01
+        torsion_friction: 0.01
+        thickness: 2e-3
+    rb_props:
+        color: [0.5, 0.5, 0.5]
+    dof_props: 
+        driveMode: ['DOF_MODE_NONE']
+    asset_options:
+        density: 100
+        fix_base_link: True
+
+hex_screw_urdf_suffixes:
+  # - '0_7'
+  # - '0_9'
+  - '1_0'
+  # - '1_1'
+  # - '1_3'
+  # - '1_5'
+
+# This should match the above suffixes
+# hex_screw_attractor_scales: [1, 1, 1, 1, 1, 1]
+# hex_screw_attractor_scales: [0.7, 0.9, 1, 1.1, 1.3, 1.5]
+# hex_screw_attractor_scales: [0.9, 1.0, 1.3]
+hex_screw_attractor_scales: [1.0]
+
+rl:
+    algo: ppo # dqn, vec_dqn, ppo ??
+    total_timesteps: 2e8
+    ppo:
+        # num of steps to run for each environment per update (i.e. batch size is n_steps * n_env)
+        n_steps: 10000
+        gamma: 0.995
+        ent_coef: 0.01
+        learning_rate: 2.5e-4
+        vf_coef: 0.5
+        max_grad_norm: 0.5
+        lam: 0.95
+        nminibatches: 40
+        noptepochs: 4
+        cliprange: 0.2
+        policy_kwargs:
+            layers: [256, 256]
+    vec_dqn:
+        buffer_size: 400000  # 100K
+        learning_starts: 10000  # Divide this by num_envs for average samples/env
+        double_q: True      # Use double dqn
+        target_network_update_freq: 10000
+        train_freq: 2       # Default: 1, Atari: 4
+        gamma: 0.995
+        policy_kwargs:
+            layers: [256, 256]
+    dqn:
+        buffer_size: 100000  # 100K
+        learning_starts: 2000
+        double_q: True      # Use double dqn
+        train_freq: 2
+        gamma: 0.995
+        policy_kwargs:
+            layers: [256, 256]
+  

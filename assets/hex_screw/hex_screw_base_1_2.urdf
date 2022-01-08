@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<robot name="hex_screw_base">
+
+  <link name="base">
+    <visual>
+      <origin xyz="0 0.01 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.12 0.02 0.12"/>
+      </geometry>
+    </visual>	
+    <collision>
+      <origin xyz="0 0.01 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.12 0.02 0.12"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="screw">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="hex_screw/screw_head.obj" scale="0.001500 0.001500 0.001500"/>
+      </geometry>
+    </visual>	
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="hex_screw/screw_head.obj" scale="0.001500 0.001500 0.001500"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="screw_to_base" type="revolute">
+    <parent link="base"/>
+    <child link="screw"/>
+    <origin xyz="0 0.025 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-3.14" upper="3.14" effort="100" velocity="3"/>
+  </joint>
+
+</robot>

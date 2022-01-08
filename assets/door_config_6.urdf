@@ -1,0 +1,97 @@
+<robot name="door">
+  
+  <link name="door_pole">
+    <visual>
+      <origin xyz="0 0.46 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.035 0.92 0.085"/>
+      </geometry>
+      <material name="dark_yellow">
+        <color rgba="0.5 0.5 0.1 1"/>
+      </material>
+    </visual>	
+    <collision>
+      <origin xyz="0 0.46 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.035 0.92 0.085"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="door_panel">
+    <visual>
+      <origin xyz="0.2175 0.465 -0.0175" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.435 0.91 0.035"/>
+      </geometry>
+      <material name="b">
+        <color rgba="0.8 0.8 0.2 1"/>
+      </material>
+    </visual>	
+    <collision>
+      <origin xyz="0.2175 0.465 -0.0175" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.435 0.91 0.035"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="door_handle_axel">
+    <visual>
+      <origin rpy="0 0 1"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.03"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>	
+    <collision>
+      <origin rpy="0 0 1"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.03"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="door_handle">
+    <visual>
+      <origin xyz="-0.06 0 0"/>
+      <geometry>
+        <box size="0.12 0.02 0.03"/>
+      </geometry>
+      <material name="silver">
+        <color rgba="0.4 0.4 0.4 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.06 0 0"/>
+      <geometry>
+        <box size="0.12 0.02 0.03"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="door_panel_pole" type="revolute">
+    <parent link="door_pole"/>
+    <child link="door_panel"/>
+    <origin xyz="0.0175 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.57" upper="0" effort="100" velocity="3"/>
+  </joint>
+  
+  <joint name="door_handle_axel_panel" type="fixed">
+    <parent link="door_panel"/>
+    <child link="door_handle_axel"/>
+    <origin xyz="0.3955 0.462 0.01575"/>
+  </joint>
+
+  <joint name="door_handle_axel" type="revolute">
+    <parent link="door_handle_axel"/>
+    <child link="door_handle"/>
+    <origin xyz="0 0 0.03"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="0" upper="1.57" effort="10" velocity="3"/>
+  </joint>
+
+</robot>

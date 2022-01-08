@@ -1,0 +1,256 @@
+local_assets_path: assets
+
+scene:
+    n_envs: 12
+    es: 1
+    gui: 1
+    gym:
+      dt: 0.01
+      substeps: 2
+      flex:
+        solver_type: 5
+        num_outer_iterations: 4
+        num_inner_iterations: 15
+        relaxation: 0.75
+        warm_start: 0.8
+        shape_collision_margin: 1e-3
+        contact_regularization: 1e-7
+        deterministic_mode: True
+  
+franka: 
+    asset_options:
+        fix_base_link: True
+        flip_visual_attachments: True
+        armature: 0.01
+        max_linear_velocity: 100.0
+        max_angular_velocity: 40.0
+        disable_gravity: True
+    attractor_props:
+        stiffness: 1e3
+        damping: 2.5e2
+    shape_props:
+        thickness: 1e-3
+    dof_props:
+        stiffness: [2e3, 2e3, 2e3, 2e3, 2e3, 2e3, 2e3, 2e4, 2e4]    # increased the last two to avoid finger floating issue
+        damping: [2e2, 2e2, 2e2, 2e2, 2e2, 2e2, 2e2, 1, 1]
+        effort: [87, 87, 87, 87, 12, 12, 12, 100, 100]
+    action:
+        mode: vic
+        vic: 
+            max_tra_delta: 0.01 # m
+            max_rot_delta: 5 # deg
+            min_stiffness: 1e2
+            max_stiffness: 1e4
+        hfpc_cartesian_gains:
+            max_tra_delta: 0.01 # m
+            max_rot_delta: 5 # deg
+            max_force_delta: 5 # N
+            min_pos_kp: 1
+            max_pos_kp: 100
+            min_force_kp: 0.01
+            max_force_kp: 10
+
+lock:
+    dims:
+        width: 0.1
+        height: 0.05
+        depth: 0.05
+    shape_props:
+        friction: 0.4
+        rolling_friction: 0.01
+        torsion_friction: 0.01
+        thickness: 5e-3
+    rb_props:
+        color: [0.3, 0.8, 0.3]
+    asset_options:
+        density: 100
+        fix_base_link: True
+
+action:
+    attractor_stiffness: 1e3
+    type: combo # raw, combo, priority
+    raw: 
+        limits: [0.1, 0.1, 0.1, 40, 40, 40, 1.01]    # the last one is for gripper. < -0.33 means close, [-0.33, 0.33] is no motion, > 0.33 means open
+    dx: 0.03
+    df: 1e-4
+    dtheta: 10
+    dl: 0.03
+    dg: 0.01
+    kI_f: 1e-4
+    auto_clip_actions: True
+    n_interp_steps: 2
+    attractors:
+        close_gripper: True
+        open_gripper: True
+#        table_normal: True
+#        table_rot: True
+#        table_force: True
+        handle_err: True
+        pole_rot: True
+        handle_rot_final: True
+        handle_force: False
+        door_force: True
+        handle_curl: True
+        pole_curl: False
+        handle_rot_init: True
+
+task:
+    max_steps: 70
+    target_pole_rotation: -35 # degrees
+    target_handle_rotation: 90 # degrees
+    pole_rotation_th: 5 # degrees
+    handle_rotation_th: 5 # degrees
+    use_controller_features: False
+    train_in_multi_env: True
+    sample_init_ee_pos: True
+    ee_pos_sample_range: 70  # will be sampled [-20, 20]
+
+env:
+    n_inter_steps: 10
+
+rews:
+    alive_penalty: -0.01
+    force_penalty_weight: -0.001
+    task_bonus: 100
+    handle_rotation_weight: 10
+    pole_rotation_weight: 100
+    approach_weight: 10
+    expand_MDP_same_controller_reward: 0  # -0.1, -1, -10 ?
+    
+table:
+    dims:
+        width: 1
+        height: 0.5
+        depth: 1
+    shape_props:
+        friction: 0.1
+        rolling_friction: 0
+        torsion_friction: 0
+        thickness: 2e-3
+    asset_options:
+        fix_base_link: True
+
+block:
+    dims:
+        width: 0.1
+        height: 0.1
+        depth: 0.1
+    shape_props:
+        friction: 0.2
+        rolling_friction: 0.01
+        torsion_friction: 0.01
+        thickness: 2e-3
+    rb_props:
+        color: [0.3, 0.8, 0.3]
+    asset_options:
+        density: 100
+
+door:
+  type: config_0
+  position: [0.02, 0.51, -0.48]
+  y_rotation: 0  # degrees
+  sample_pose: True
+  position_sample_range: [0.05, 0.0, 0.05]
+  y_rotation_sample_range: 4 # degrees
+  multi_env_types:
+    - config_0
+    - config_1
+    - config_2
+    - config_3
+    # - config_4
+    # - config_5
+  asset_options:
+    fix_base_link: True
+    flip_visual_attachments: True
+    armature: 0.01
+    max_linear_velocity: 100.0
+    max_angular_velocity: 40.0
+    disable_gravity: True
+  shape_props:
+    friction: 3
+    rolling_friction: 0.1
+    torsion_friction: 0.1
+    thickness: 1e-3
+
+  config_0:
+    urdf_path: door_config_0.urdf
+    dof_props:
+      stiffness: [10, 1]
+      damping: [1, 1]
+      effort: [50, 50]
+      driveMode: ['DOF_MODE_NONE', 'DOF_MODE_POS']
+
+  config_1:
+    urdf_path: door_config_1.urdf
+    dof_props:
+      stiffness: [10, 1]
+      damping: [1, 1]
+      effort: [50, 50]
+      driveMode: ['DOF_MODE_NONE', 'DOF_MODE_POS']
+
+  config_2:
+    urdf_path: door_config_2.urdf
+    dof_props:
+      stiffness: [10, 1]
+      damping: [1, 1]
+      effort: [50, 50]
+      driveMode: ['DOF_MODE_NONE', 'DOF_MODE_POS']
+
+  config_3:
+    urdf_path: door_config_3.urdf
+    dof_props:
+      stiffness: [10, 1]
+      damping: [1, 1]
+      effort: [50, 50]
+      driveMode: ['DOF_MODE_NONE', 'DOF_MODE_POS']
+
+  config_4:
+    urdf_path: door_config_4.urdf
+    dof_props:
+      stiffness: [10, 1]
+      damping: [1, 1]
+      effort: [50, 50]
+      driveMode: ['DOF_MODE_NONE', 'DOF_MODE_NONE']
+
+  config_5:
+    urdf_path: door_config_5.urdf
+    dof_props:
+      stiffness: [10, 1]
+      damping: [1, 1]
+      effort: [50, 50]
+      driveMode: ['DOF_MODE_NONE', 'DOF_MODE_POS']
+
+rl:
+    algo: ppo # dqn, vec_dqn, ppo ??
+    total_timesteps: 1e9
+    ppo:
+        # num of steps to run for each environment per update (i.e. batch size is n_steps * n_env)
+        n_steps: 1024
+        gamma: 0.995
+        ent_coef: 0.01
+        learning_rate: 2.5e-4
+        vf_coef: 0.5
+        max_grad_norm: 0.5
+        lam: 0.95
+        nminibatches: 40
+        noptepochs: 4
+        cliprange: 0.2
+        policy_kwargs:
+            layers: [256, 256]
+    vec_dqn:
+        buffer_size: 400000  # 100K
+        learning_starts: 10000  # Divide this by num_envs for average samples/env
+        double_q: True      # Use double dqn
+        target_network_update_freq: 10000
+        train_freq: 2       # Default: 1, Atari: 4
+        gamma: 0.995
+        policy_kwargs:
+            layers: [256, 256]
+    dqn:
+        buffer_size: 100000  # 100K
+        learning_starts: 2000
+        double_q: True      # Use double dqn
+        train_freq: 2
+        gamma: 0.995
+        policy_kwargs:
+            layers: [256, 256]
