@@ -1,7 +1,7 @@
 # Learning to Compose Hierarchical Object-Centric Controllers for Robotic Manipulation
 
 
-This code is associated with our [CoRL'20 paper](). The webiste  
+This code is associated with our [CoRL'20 paper]().  
 **[[Paper]](https://arxiv.org/abs/2011.04627)**&nbsp;**[[Project Website]](https://sites.google.com/view/compositional-object-control/home)**
 
 
@@ -22,7 +22,9 @@ python ./scripts/train_franka_door.py --seed 101 --cfg ./cfg/run_franka_door_ope
 
 ### Code
 
-All the environments used in the paper are defined in `object_axes_ctrls/envs`. While the controllers and their composition is defined in `object_axes_ctrlrs/controllers/projected_axes_attractors.py`. Each controller is parameterized with respect to the environment and created in the coresponding environment class. The expanded MDP formulation is implemented in `envs/env_wrappers.py`.
+- Environments: All the environments used in the paper are defined in `object_axes_ctrls/envs`. 
+- Task-Axes Controllers: The controllers and their composition is defined in `object_axes_ctrlrs/controllers/projected_axes_attractors.py`. Each controller is parameterized with respect to the environment and created in the coresponding environment class. 
+- Expanded-MDP: The expanded MDP formulation is implemented in `envs/env_wrappers.py`.
 
 
 ### Assets 
